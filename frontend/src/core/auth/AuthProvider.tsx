@@ -10,7 +10,6 @@ import React, {
   type ReactNode,
 } from "react";
 
-import { hasEmbedToken, withEmbedAuthHeader } from "../embed-auth";
 import { isStaticWebsiteOnly } from "../static-mode";
 
 import { type User, buildLoginUrl } from "./types";
@@ -74,7 +73,6 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
       setIsLoading(true);
       const res = await fetch("/api/v1/auth/me", {
         credentials: "include",
-        headers: withEmbedAuthHeader(undefined),
       });
 
       if (res.ok) {
@@ -83,7 +81,6 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
       } else if (res.status === 401) {
         // Session expired or invalid
         setUser(null);
-        if (hasEmbedToken()) return;
         // Redirect to login if on a protected route
         if (pathname?.startsWith("/workspace")) {
           router.push(buildLoginUrl(pathname));

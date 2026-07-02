@@ -14,7 +14,11 @@ import {
   fetchSetupStatus,
   type SetupStatusResponse,
 } from "@/core/auth/setup";
-import { parseAuthError } from "@/core/auth/types";
+import {
+  buildLoginUrl,
+  hasExternalLoginUrl,
+  parseAuthError,
+} from "@/core/auth/types";
 import { useI18n } from "@/core/i18n/hooks";
 
 /**
@@ -86,6 +90,7 @@ export default function LoginPage() {
   // Get next parameter for validated redirect
   const nextParam = searchParams.get("next");
   const redirectPath = validateNextParam(nextParam) ?? "/workspace";
+  const externalLoginEnabled = hasExternalLoginUrl();
   const regularSignupAllowed = canCreateRegularAccount({
     checked: setupStatusChecked,
     status: setupStatus,
@@ -98,6 +103,12 @@ export default function LoginPage() {
       router.push(redirectPath);
     }
   }, [isAuthenticated, redirectPath, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated && externalLoginEnabled) {
+      window.location.replace(buildLoginUrl(redirectPath));
+    }
+  }, [externalLoginEnabled, isAuthenticated, redirectPath]);
 
   // Fetch setup state and SSO providers
   useEffect(() => {
@@ -195,6 +206,34 @@ export default function LoginPage() {
   };
 
   const actualTheme = theme === "system" ? resolvedTheme : theme;
+
+  if (externalLoginEnabled) {
+    return (
+      <div className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
+        <FlickeringGrid
+          className="absolute inset-0 z-0 mask-[url(/images/deer.svg)] mask-size-[100vw] mask-center mask-no-repeat md:mask-size-[72vh]"
+          squareSize={4}
+          gridGap={4}
+          color={actualTheme === "dark" ? "white" : "black"}
+          maxOpacity={0.3}
+          flickerChance={0.25}
+        />
+        <div className="border-border/20 bg-background/5 relative z-10 w-full max-w-sm space-y-4 rounded-3xl border p-8 text-center backdrop-blur-sm">
+          <h1 className="text-foreground font-serif text-3xl">DeerFlow</h1>
+          <p className="text-muted-foreground text-sm">{t.login.pleaseWait}</p>
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => {
+              window.location.href = buildLoginUrl(redirectPath);
+            }}
+          >
+            {t.login.signIn}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background relative flex min-h-screen items-center justify-center overflow-x-hidden overflow-y-auto">

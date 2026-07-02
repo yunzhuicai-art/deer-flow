@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { env } from "@/env";
+
 // ── User schema (single source of truth) ──────────────────────────
 
 export const userSchema = z.object({
@@ -28,7 +30,21 @@ export function assertNever(x: never): never {
   throw new Error(`Unexpected auth result: ${JSON.stringify(x)}`);
 }
 
+export function hasExternalLoginUrl(): boolean {
+  return Boolean(env.NEXT_PUBLIC_DEERFLOW_EXTERNAL_LOGIN_URL?.trim());
+}
+
 export function buildLoginUrl(returnPath: string): string {
+  const externalLoginUrl =
+    env.NEXT_PUBLIC_DEERFLOW_EXTERNAL_LOGIN_URL?.trim();
+  if (externalLoginUrl) {
+    const encodedReturnPath = encodeURIComponent(returnPath);
+    if (externalLoginUrl.includes("{next}")) {
+      return externalLoginUrl.replaceAll("{next}", encodedReturnPath);
+    }
+    const separator = externalLoginUrl.includes("?") ? "&" : "?";
+    return `${externalLoginUrl}${separator}next=${encodedReturnPath}`;
+  }
   return `/login?next=${encodeURIComponent(returnPath)}`;
 }
 

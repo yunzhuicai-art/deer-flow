@@ -17,12 +17,12 @@ import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import { getAPIClient } from "../api";
 import { fetch } from "../api/fetcher";
 import { getBackendBaseURL } from "../config";
-import { getOrpheusEmbedContext } from "../embed-auth";
 import { useI18n } from "../i18n/hooks";
 import { isHiddenFromUIMessage } from "../messages/utils";
 import type { FileInMessage } from "../messages/utils";
 import type { LocalSettings } from "../settings";
 import { useUpdateSubtask } from "../tasks/context";
+import { messageToStep } from "../tasks/steps";
 import type { UploadedFileInfo } from "../uploads";
 import { promptInputFilePartToFile, uploadFiles } from "../uploads";
 
@@ -44,16 +44,6 @@ export type ToolEndEvent = {
   name: string;
   data: unknown;
 };
-
-function orpheusEmbedMetadata(): Record<string, string | boolean> {
-  const embedContext = getOrpheusEmbedContext();
-  return embedContext
-    ? {
-        ...embedContext,
-        orpheus_embed: true,
-      }
-    : {};
-}
 
 export type ThreadStreamOptions = {
   threadId?: string | null | undefined;
@@ -226,7 +216,13 @@ export function buildVisibleHistoryMessages(
     (message) => !supersededRunIds.has(message.run_id),
   );
   return dedupeMessagesByIdentity([
-    ...visibleRows.map((message) => message.content),
+    // Carry the owning run_id onto the content message so historical subtask
+    // cards can fetch their persisted step history on expand (#3779). run_id
+    // lives on the RunMessage wrapper and would otherwise be dropped here.
+    ...visibleRows.map((message) => ({
+      ...message.content,
+      run_id: message.run_id,
+    })),
     ...appendedMessages,
   ]);
 }
@@ -978,8 +974,16 @@ export function useThreadStream({
           type: "task_running";
           task_id: string;
           message: AIMessage;
+          message_index?: number;
         };
-        updateSubtask({ id: e.task_id, latestMessage: e.message });
+        // Accumulate the full step history instead of overwriting (#3779): keep
+        // latestMessage for the collapsed-header tool-call hint, and append the
+        // normalized step (assistant turn or tool output) to the timeline.
+        updateSubtask({
+          id: e.task_id,
+          latestMessage: e.message,
+          steps: [messageToStep(e.message, e.message_index ?? 0)],
+        });
         return;
       }
 
@@ -1315,13 +1319,11 @@ export function useThreadStream({
             threadId: threadId,
             streamSubgraphs: true,
             streamResumable: true,
-            metadata: orpheusEmbedMetadata(),
             config: {
               recursion_limit: 1000,
             },
             context: {
               ...extraContext,
-              ...orpheusEmbedMetadata(),
               ...context,
               thinking_enabled: context.mode !== "flash",
               is_plan_mode: context.mode === "pro" || context.mode === "ultra",
@@ -1420,17 +1422,13 @@ export function useThreadStream({
         await thread.submit(prepared.input, {
           threadId,
           checkpoint: prepared.checkpoint,
-          metadata: {
-            ...prepared.metadata,
-            ...orpheusEmbedMetadata(),
-          },
+          metadata: prepared.metadata,
           streamSubgraphs: true,
           streamResumable: true,
           config: {
             recursion_limit: 1000,
           },
           context: {
-            ...orpheusEmbedMetadata(),
             ...context,
             thinking_enabled: context.mode !== "flash",
             is_plan_mode: context.mode === "pro" || context.mode === "ultra",
