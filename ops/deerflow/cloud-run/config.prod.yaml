@@ -9,10 +9,10 @@ token_usage:
   enabled: true
 
 models:
-  - name: gpt-5-responses
-    display_name: GPT-5
+  - name: gpt-5.4-nano-responses
+    display_name: GPT-5.4 Nano
     use: langchain_openai:ChatOpenAI
-    model: gpt-5
+    model: gpt-5.4-nano
     api_key: $OPENAI_API_KEY
     request_timeout: 600.0
     max_retries: 2
@@ -20,6 +20,7 @@ models:
     output_version: responses/v1
     supports_vision: true
     supports_thinking: true
+    supports_reasoning_effort: true
 
 tool_groups:
   - name: web
