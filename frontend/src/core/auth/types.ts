@@ -35,8 +35,7 @@ export function hasExternalLoginUrl(): boolean {
 }
 
 export function buildLoginUrl(returnPath: string): string {
-  const externalLoginUrl =
-    env.NEXT_PUBLIC_DEERFLOW_EXTERNAL_LOGIN_URL?.trim();
+  const externalLoginUrl = env.NEXT_PUBLIC_DEERFLOW_EXTERNAL_LOGIN_URL?.trim();
   if (externalLoginUrl) {
     const encodedReturnPath = encodeURIComponent(returnPath);
     if (externalLoginUrl.includes("{next}")) {
