@@ -219,7 +219,9 @@ export default function LoginPage() {
           flickerChance={0.25}
         />
         <div className="border-border/20 bg-background/5 relative z-10 w-full max-w-sm space-y-4 rounded-3xl border p-8 text-center backdrop-blur-sm">
-          <h1 className="text-foreground font-serif text-3xl">DeerFlow</h1>
+          <h1 className="text-foreground font-serif text-3xl">
+            Agent Workspace
+          </h1>
           <p className="text-muted-foreground text-sm">{t.login.pleaseWait}</p>
           <Button
             type="button"
@@ -247,7 +249,9 @@ export default function LoginPage() {
       />
       <div className="border-border/20 bg-background/5 w-full max-w-md space-y-6 rounded-3xl border p-8 backdrop-blur-sm">
         <div className="text-center">
-          <h1 className="text-foreground font-serif text-3xl">DeerFlow</h1>
+          <h1 className="text-foreground font-serif text-3xl">
+            Agent Workspace
+          </h1>
           <p className="text-muted-foreground mt-2">
             {isLogin ? t.login.signInTitle : t.login.createAccountTitle}
           </p>

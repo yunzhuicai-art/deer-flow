@@ -1,6 +1,3 @@
-"use client";
-
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 
 import { AuroraText } from "@/components/ui/aurora-text";
@@ -13,21 +10,14 @@ export function CommunitySection() {
     <Section
       title={
         <AuroraText colors={["#60A5FA", "#A5FA60", "#A560FA"]}>
-          Join the Community
+          Start Working
         </AuroraText>
       }
-      subtitle="Contribute brilliant ideas to shape the future of DeerFlow. Collaborate, innovate, and make impacts."
+      subtitle="Open the workspace and start a task with research, tools, files, and sandboxed execution."
     >
       <div className="flex justify-center">
         <Button className="text-xl" size="lg" asChild>
-          <Link
-            href="https://github.com/bytedance/deer-flow"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GitHubLogoIcon />
-            Contribute Now
-          </Link>
+          <Link href="/workspace">Open Workspace</Link>
         </Button>
       </div>
     </Section>

@@ -43,8 +43,8 @@ const features: BentoCardProps[] = [
   {
     color: COLOR,
     label: "Free",
-    title: "Open Source",
-    description: "MIT License, self-hosted, full control",
+    title: "Self-Hosted Control",
+    description: "Run with your own stack and provider configuration",
   },
 ];
 
@@ -52,8 +52,8 @@ export function WhatsNewSection({ className }: { className?: string }) {
   return (
     <Section
       className={cn("", className)}
-      title="Whats New in DeerFlow 2.0"
-      subtitle="DeerFlow is now evolving from a Deep Research agent into a full-stack Super Agent"
+      title="What the Workspace Can Do"
+      subtitle="A deep research experience with tools, memory, sandboxes, and multi-step execution"
     >
       <div className="flex w-full items-center justify-center">
         <MagicBento data={features} />

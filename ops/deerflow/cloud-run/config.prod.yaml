@@ -103,10 +103,10 @@ memory:
   token_counting: char
 
 agents_api:
-  enabled: false
+  enabled: true
 
 skill_evolution:
-  enabled: false
+  enabled: true
   moderation_model_name: null
 
 sandbox:
