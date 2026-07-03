@@ -13,7 +13,7 @@ test.describe("Landing page", () => {
 
     // "Open Workspace" call-to-action button in hero
     await expect(
-      page.getByRole("link", { name: /open workspace/i }),
+      page.getByRole("link", { name: /open workspace/i }).first(),
     ).toBeVisible();
   });
 
