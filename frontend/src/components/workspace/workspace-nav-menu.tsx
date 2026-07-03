@@ -7,6 +7,7 @@ import {
   Settings2Icon,
   SettingsIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import {
@@ -95,12 +96,12 @@ export function WorkspaceNavMenu() {
                     {t.common.settings}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <a href="/">
+                  <Link href="/">
                     <DropdownMenuItem>
                       <GlobeIcon />
                       {t.workspace.officialWebsite}
                     </DropdownMenuItem>
-                  </a>
+                  </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
