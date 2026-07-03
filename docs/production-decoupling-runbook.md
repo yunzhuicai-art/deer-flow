@@ -135,6 +135,11 @@ database.backend: postgres
 run_events.backend: db
 sandbox.use: deerflow.community.vercel_sandbox:VercelSandboxProvider
 sandbox.vercel_record_store: database
+tool_search.enabled: true
+tool_output.enabled: true
+summarization.enabled: true
+loop_detection.enabled: true
+safety_finish_reason.enabled: true
 ```
 
 Production env/secrets:
@@ -142,6 +147,9 @@ Production env/secrets:
 ```text
 DATABASE_URL
 OPENAI_API_KEY or selected model-provider keys
+VOLCENGINE_API_KEY
+VOLCENGINE_MODEL
+VOLCENGINE_BASE_URL
 VERCEL_TOKEN
 VERCEL_PROJECT_ID
 VERCEL_TEAM_ID
@@ -156,9 +164,32 @@ FIRECRAWL_API_KEY
 BRAVE_SEARCH_API_KEY
 BRAVE_ANSWER_API_KEY
 VOLCENGINE_ARK_API_KEY
+MINIMAX_API_KEY
+MINIMAX_API_HOST
+IMAGE_GENERATION_PROVIDER
+VIDEO_GENERATION_PROVIDER
+PODCAST_GENERATION_PROVIDER
+MINIMAX_IMAGE_MODEL
+MINIMAX_VIDEO_MODEL
+MINIMAX_MUSIC_MODEL
+MINIMAX_TTS_MODEL
 ```
 
 Only configure keys that are actually enabled by the selected provider config.
+
+Current production provider choices in `ops/deerflow/cloud-run/config.prod.yaml`:
+
+```text
+models:
+  primary OpenAI-compatible GPT-5.4 Nano responses model
+  Volcengine Agent Plan OpenAI-compatible model
+web_search:
+  fallback_search with Tavily, Brave Search, and SearXNG
+web_fetch:
+  fallback_fetch with Firecrawl-backed API config
+sandbox:
+  VercelSandboxProvider with MiniMax/media provider env passed into sandbox
+```
 
 ### 4. Sandbox Provider
 

@@ -22,6 +22,18 @@ models:
     supports_thinking: true
     supports_reasoning_effort: true
 
+  - name: volcengine-agent-plan
+    display_name: Volcengine Agent Plan
+    use: langchain_openai:ChatOpenAI
+    model: $VOLCENGINE_MODEL
+    api_key: $VOLCENGINE_API_KEY
+    base_url: $VOLCENGINE_BASE_URL
+    request_timeout: 600.0
+    max_retries: 2
+    stream_usage: true
+    supports_vision: false
+    supports_thinking: false
+
 tool_groups:
   - name: web
   - name: file:read
@@ -31,13 +43,18 @@ tool_groups:
 tools:
   - name: web_search
     group: web
-    use: deerflow.community.ddg_search.tools:web_search_tool
+    use: deerflow.community.fallback_search.tools:web_search_tool
+    api_key: $TAVILY_API_KEY
+    brave_api_key: $BRAVE_SEARCH_API_KEY
+    searxng_base_url: http://searxng:8080
+    searxng_engines: bing,mojeek,qwant
     max_results: 5
 
   - name: web_fetch
     group: web
-    use: deerflow.community.jina_ai.tools:web_fetch_tool
+    use: deerflow.community.fallback_fetch.tools:web_fetch_tool
     timeout: 10
+    api_key: $FIRECRAWL_API_KEY
 
   - name: image_search
     group: web
@@ -75,11 +92,65 @@ tools:
     use: deerflow.sandbox.tools:bash_tool
 
 tool_search:
-  enabled: false
+  enabled: true
+
+uploads:
+  max_files: 10
   max_file_size: 52428800
   max_total_size: 104857600
   auto_convert_documents: false
   pdf_converter: auto
+
+tool_output:
+  enabled: true
+  externalize_min_chars: 12000
+  preview_head_chars: 2000
+  preview_tail_chars: 1000
+  fallback_max_chars: 30000
+  fallback_head_chars: 8000
+  fallback_tail_chars: 3000
+  storage_subdir: .tool-results
+  exempt_tools:
+    - read_file
+    - read_file_tool
+
+suggestions:
+  enabled: false
+
+title:
+  enabled: true
+  max_words: 6
+  max_chars: 60
+  model_name: null
+
+summarization:
+  enabled: true
+  model_name: null
+  trigger:
+    - type: tokens
+      value: 32000
+  keep:
+    type: messages
+    value: 20
+  trim_tokens_to_summarize: 15564
+  summary_prompt: null
+  skill_file_read_tool_names:
+    - read_file
+    - read
+    - view
+    - cat
+
+loop_detection:
+  enabled: true
+  warn_threshold: 3
+  hard_limit: 5
+  window_size: 20
+  max_tracked_threads: 100
+  tool_freq_warn: 30
+  tool_freq_hard_limit: 50
+
+safety_finish_reason:
+  enabled: true
 
 database:
   backend: postgres
@@ -127,3 +198,13 @@ sandbox:
   read_file_output_max_chars: 50000
   ls_output_max_chars: 20000
   bash_command_timeout: 600
+  environment:
+    MINIMAX_API_KEY: $MINIMAX_API_KEY
+    MINIMAX_API_HOST: $MINIMAX_API_HOST
+    IMAGE_GENERATION_PROVIDER: $IMAGE_GENERATION_PROVIDER
+    VIDEO_GENERATION_PROVIDER: $VIDEO_GENERATION_PROVIDER
+    PODCAST_GENERATION_PROVIDER: $PODCAST_GENERATION_PROVIDER
+    MINIMAX_IMAGE_MODEL: $MINIMAX_IMAGE_MODEL
+    MINIMAX_VIDEO_MODEL: $MINIMAX_VIDEO_MODEL
+    MINIMAX_MUSIC_MODEL: $MINIMAX_MUSIC_MODEL
+    MINIMAX_TTS_MODEL: $MINIMAX_TTS_MODEL
