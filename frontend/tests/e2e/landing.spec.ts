@@ -6,24 +6,26 @@ test.describe("Landing page", () => {
   test("renders the header and hero section", async ({ page }) => {
     await page.goto("/");
 
-    // Header brand name
+    // Header product name
     await expect(
-      page.locator("header h1", { hasText: "DeerFlow" }),
+      page.locator("header h1", { hasText: "Agent Workspace" }),
     ).toBeVisible();
 
-    // "Get Started" call-to-action button in hero
+    // "Open Workspace" call-to-action button in hero
     await expect(
-      page.getByRole("link", { name: /get started/i }),
+      page.getByRole("link", { name: /open workspace/i }).first(),
     ).toBeVisible();
   });
 
-  test("Get Started link navigates to workspace", async ({ page }) => {
+  test("Open Workspace link navigates to workspace", async ({ page }) => {
     mockLangGraphAPI(page);
 
     await page.goto("/");
 
-    const getStarted = page.getByRole("link", { name: /get started/i });
-    await getStarted.click();
+    const openWorkspace = page
+      .getByRole("link", { name: /open workspace/i })
+      .first();
+    await openWorkspace.click();
 
     // Should redirect to /workspace/chats/new
     await page.waitForURL("**/workspace/chats/new");
